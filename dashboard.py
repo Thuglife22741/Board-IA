@@ -689,7 +689,7 @@ def painel_mensagem():
     st.download_button(
         label="Baixar relatório em CSV",
         data=df.to_csv(index=False).encode('utf-8'),
-        file_name=csv_file_path,
+        file_name=str(csv_file_path),
         mime='text/csv'
     )
 
