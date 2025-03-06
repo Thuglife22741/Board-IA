@@ -443,9 +443,18 @@ def painel_mensagem():
         if pd.isna(data_string) or not data_string:
             return ''
         try:
-            # Tenta converter para datetime
-            data_formatada = pd.to_datetime(data_string, format='%d/%m/%y %H:%M:%S', dayfirst=True)
-            return data_formatada.strftime('%d/%m/%y %H:%M:%S')
+            # First try to parse as timestamp
+            try:
+                data_timestamp = int(data_string)
+                data_formatada = pd.to_datetime(data_timestamp, unit='s')
+                return data_formatada.strftime('%d/%m/%y %H:%M:%S')
+            except ValueError:
+                # If not timestamp, try as formatted date
+                data_formatada = pd.to_datetime(data_string, format='%d/%m/%y %H:%M:%S', dayfirst=True)
+                return data_formatada.strftime('%d/%m/%y %H:%M:%S')
+        except Exception as e:
+            st.warning(f"Erro ao converter data: {data_string} - {e}")
+            return ''
         except:
             try:
                 # Tenta converter timestamp
@@ -668,12 +677,14 @@ def painel_mensagem():
     if st.button("Salvar Seleções"):
         salvar_checks_no_redis(redis_client, updated_df)
         st.toast("Seleções salvas com sucesso!", icon="✅")
+    # Ensure data directory exists
+    data_dir = Path('data')
+    data_dir.mkdir(exist_ok=True)
     
-    # Salvar o dataframe em um arquivo CSV após gerar a tabela
-    csv_file_path = "data/relatorios_conversas.csv"
+    # Save the dataframe to CSV with proper path handling
+    csv_file_path = data_dir / 'relatorios_conversas.csv'
     df.to_csv(csv_file_path, index=False)
-    st.toast((f"Relatório salvo como {csv_file_path}"), icon="✅")
-
+    st.toast(f"Relatório salvo como {csv_file_path}", icon="✅")
     # Oferecer o download para o usuário
     st.download_button(
         label="Baixar relatório em CSV",
