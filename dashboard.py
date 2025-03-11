@@ -369,7 +369,7 @@ def painel_mensagem():
         try:
             mensagens_limitadas = '\n'.join(mensagens.strip().split('\n')[-20:])
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4",
                 messages=[
                     {"role": "system", "content": f"Analise a conversa entre o usuário, cujo telefone é {phone_number}, e a IA, cujo nome é {ai_name}. Classifique a conversa conforme as seguintes categorias: {ai_status}. Sua resposta deve conter apenas a classificação. Exemplo: 'Lead quente'"},
                     {"role": "user", "content": f"As mensagens são:\n\n{mensagens_limitadas}"},
